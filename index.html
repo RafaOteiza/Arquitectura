@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio de Sesión</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="main">
+        <div class="container">
+            <h2 class="title">Iniciar Sesión</h2>
+            <form id="loginForm" onsubmit="login(event)">
+                <input id="username" class="form__input" type="text" placeholder="Nombre de usuario" required>
+                <input id="password" class="form__input" type="password" placeholder="Contraseña" required>
+                
+                <div class="options">
+                    <label>
+                        <input type="checkbox"> Recordar?
+                    </label>
+                    <a href="recuperar.html">¿Olvidaste tu Contraseña?</a>
+                </div>
+                
+                <button class="button" type="submit">Iniciar Sesión</button>
+                <p id="loginError" class="error-message"></p>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
