@@ -41,6 +41,18 @@ body {
     overflow: hidden;
 }
 
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.login-logo {
+    width: 80px; /* Ajusta el tamaño según sea necesario */
+    margin-bottom: 10px; /* Espacio entre el logo y el título */
+}
+
+
 .container {
     display: flex;
     justify-content: center;
@@ -168,12 +180,12 @@ body {
 .dashboard-sidebar nav ul li a .icon {
     width: 24px;
     height: 24px;
-    margin-right: 12px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
+    margin-right: 10px;
+    vertical-align: middle;
+    fill: var(--sidebar-text);
+    display: inline-block;
 }
+
 
 /* Ejemplo de iconos usando FontAwesome */
 .dashboard-sidebar nav ul li a .icon-dashboard::before {
@@ -304,6 +316,7 @@ body {
     height: 70px;
     background: linear-gradient(to right, #08112F, #3E53A0, #5A77DF);
     display: flex;
+    justify-content: space-between;
     align-items: center;
     padding: 0 20px;
     border-radius: 0 0 16px 16px;
@@ -334,8 +347,31 @@ body {
     color: var(--white);
 }
 
+.navbar-logo {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-logo h2 {
+    margin-left: 10px;
+    text-align: center;
+    line-height: 1; /* Ajusta la altura de línea si es necesario */
+}
+
 .user-icon {
     width: 30px;
     height: 30px;
     border-radius: 50%;
+}
+
+.recover-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.recover-logo {
+    width: 80px; /* Ajusta el tamaño según sea necesario */
+    margin-bottom: 10px; /* Espacio entre el logo y el título */
 }
