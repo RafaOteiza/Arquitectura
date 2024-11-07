@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración de Usuario</title>
+    <link rel="stylesheet" href="css/views.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div id="navbar-container"></div>
+    <div class="dashboard-container d-flex">
+        <div id="sidebar-container"></div>
+        <main class="dashboard-main flex-fill">
+            <h1 class="dashboard-header">Configuración de Usuario</h1>
+            </header>
+
+            <div class="main-content-profile">
+                <!-- Sección de imagen de usuario -->
+                <div class="user-image-section">
+                    <div class="user-image-container">
+                        <img src="img/default-profile.png" alt="Foto de perfil" class="profile-picture">
+                        <p class="user-occupation">Ocupación: Analista</p>
+                        <button class="change-image-btn">Cambiar Imagen</button>
+                    </div>
+                </div>
+
+                <!-- Formulario de información de usuario -->
+                <div class="user-info-form">
+                    <label for="name">Nombre</label>
+                    <input type="text" id="name" value="Rafael Oteiza">
+
+                    <label for="email">Email</label>
+                    <input type="email" id="email" value="rafael.oteiza@servcal.cl">
+
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" value="******">
+
+                    <label for="phone">Teléfono</label>
+                    <input type="tel" id="phone" value="+56 9 66666666">
+
+                    <button class="save-changes-btn">Guardar Cambios</button>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="js/main.js"></script>
+    <script>
+        fetch('navbar.html')
+            .then(response => response.text())
+            .then(data => document.getElementById('navbar-container').innerHTML = data)
+            .catch(error => console.error('Error al cargar navbar:', error));
+        
+        fetch('sidebar.html')
+            .then(response => response.text())
+            .then(data => document.getElementById('sidebar-container').innerHTML = data)
+            .catch(error => console.error('Error al cargar sidebar:', error));
+    </script>
+</body>
+</html>

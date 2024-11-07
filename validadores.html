@@ -3,39 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Validadores - SV</title>
+    <title>Gestión de Validadores</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/views.css">
 </head>
 <body>
-    <div class="sidebar">
-        <!-- Sidebar navigation similar to dashboard.html -->
+    <div id="navbar-container"></div>
+    <div class="dashboard-container d-flex">
+        <div id="sidebar-container"></div> <!-- Contenedor para cargar la sidebar -->
+
+        <main class="dashboard-main flex-fill">
+            <h1 class="dashboard-header">Consultar Estado Validadores</h1>
+            <div class="main-content">
+                <!-- Sección de la tabla de validadores -->
+                <div class="table-section">
+                    <table>
+                        <tr>
+                            <th>AMID</th>
+                            <th>Fecha Último Movimiento</th>
+                            <th>Estado</th>
+                            <th>Ubicación</th>
+                        </tr>
+                        <tr>
+                            <td>749RU23</td>
+                            <td>14-03-2024</td>
+                            <td>Disponible</td>
+                            <td>Zonas Pagas</td>
+                        </tr>
+                        <tr>
+                            <td>723Q9R0</td>
+                            <td>01-02-2021</td>
+                            <td>En reparación</td>
+                            <td>Garantía</td>
+                        </tr>
+                        <tr>
+                            <td>745H5J3</td>
+                            <td>05-04-2023</td>
+                            <td>En custodia</td>
+                            <td>Zonas Pagas</td>
+                        </tr>
+                        <tr>
+                            <td>7419Q20</td>
+                            <td>12-12-2023</td>
+                            <td>Préstamo</td>
+                            <td>Sonda</td>
+                        </tr>
+                        <tr>
+                            <td>729UQ23</td>
+                            <td>14-03-2024</td>
+                            <td>Disponible</td>
+                            <td>LAB-DEV</td>
+                        </tr>
+                    </table>
+                    <div class="footer-buttons">
+                        <button class="report-button">Extraer Reporte</button>
+                        <button class="upload-button">Carga Masiva</button>
+                    </div>
+                </div>
+
+                <!-- Sección de controles -->
+                <div class="controls-section">
+                    <!-- Cambiar Estado Validador -->
+                    <div class="control-box">
+                        <h3>Cambiar Estado Validador</h3>
+                        <label for="change-amid">Ingresar Amid:</label>
+                        <input type="text" id="change-amid">
+                        <label for="new-status">Seleccionar Nuevo Estado:</label>
+                        <select id="new-status">
+                            <option>Disponible</option>
+                            <option>En reparación</option>
+                            <option>En custodia</option>
+                            <option>Préstamo</option>
+                        </select>
+                        <button>Enviar</button>
+                    </div>
+
+                    <!-- Agregar Nuevo Validador -->
+                    <div class="control-box">
+                        <h3>Agregar Nuevo Validador</h3>
+                        <label for="new-series">Ingresar Serie:</label>
+                        <input type="text" id="new-series">
+                        <label for="new-amid">Ingresar AMID:</label>
+                        <input type="text" id="new-amid">
+                        <label for="new-model">Seleccionar Modelo de Validador:</label>
+                        <select id="new-model">
+                            <option>CV35</option>
+                            <option>CV45</option>
+                            <!-- Otros modelos aquí -->
+                        </select>
+                        <label for="entry-date">Fecha Ingreso Validador:</label>
+                        <input type="text" id="entry-date" placeholder="dd/mm">
+                        <label for="observation">Observación:</label>
+                        <input type="text" id="observation">
+                        <button>Enviar</button>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
-    <div class="main-content">
-        <header>
-            <input type="search" placeholder="Buscar...">
-            <span>Antonia Pacheco</span>
-        </header>
-        <section class="validadores">
-            <h2>Consultar Estado Validadores</h2>
-            <table>
-                <tr>
-                    <th>Serie</th>
-                    <th>AMID</th>
-                    <th>Modelo</th>
-                    <th>Estado</th>
-                    <th>Ubicación</th>
-                </tr>
-                <!-- Datos de ejemplo -->
-                <tr>
-                    <td>749RU23</td>
-                    <td>Amid</td>
-                    <td>CV45</td>
-                    <td>Disponible</td>
-                    <td>Zonas Pagas</td>
-                </tr>
-            </table>
-        </section>
-    </div>
+    
     <script src="js/main.js"></script>
+    <script>
+        // Cargar el navbar
+        fetch('navbar.html')
+            .then(response => response.text())
+            .then(data => document.getElementById('navbar-container').innerHTML = data)
+            .catch(error => console.error('Error al cargar navbar:', error));
+        
+        // Cargar el sidebar
+        fetch('sidebar.html')
+            .then(response => response.text())
+            .then(data => document.getElementById('sidebar-container').innerHTML = data)
+            .catch(error => console.error('Error al cargar sidebar:', error));
+    </script>
 </body>
 </html>

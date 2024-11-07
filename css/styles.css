@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+
 :root {
     --bg: #EDF2F0;
     --neu-1: #ecf0f3;
@@ -6,245 +8,197 @@
     --gray: #a0a5a8;
     --black: #181818;
     --purple: #4B70E2;
-    --sidebar-bg: #4B70E2;
-    --sidebar-text: #ffffff;
-    --transition: 1.25s;
-}
-
-*, *::after, *::before {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    user-select: none;
+    --sbar-bg: #4B70E2;
+    --sbar-text: #ffffff;
 }
 
 body {
-    width: 100%;
-    height: 100vh;
     font-family: 'Montserrat', sans-serif;
-    font-size: 12px;
     background-color: var(--neu-1);
     color: var(--gray);
+    height: 100vh;
+    margin: 0;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-/* Estilos específicos para el contenedor principal del login */
 .main {
-    position: relative;
     width: 400px;
     padding: 25px;
     background-color: var(--neu-1);
     box-shadow: 10px 10px 10px var(--neu-2), -10px -10px 10px var(--white);
     border-radius: 12px;
-    overflow: hidden;
-}
-
-.login-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.login-logo {
-    width: 80px; /* Ajusta el tamaño según sea necesario */
-    margin-bottom: 10px; /* Espacio entre el logo y el título */
-}
-
-
-.container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-}
-
-.title {
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--black);
-    margin-bottom: 20px;
+    text-align: center;
 }
 
 .form__input {
     width: 100%;
     height: 40px;
     margin-top: 10px;
-    margin-bottom: 5px;
     padding-left: 15px;
-    font-size: 14px;
-    border: none;
-    outline: none;
     background-color: var(--neu-1);
     border-radius: 8px;
     box-shadow: inset 2px 2px 4px var(--neu-2), inset -2px -2px 4px var(--white);
-    transition: 0.25s ease;
-}
-
-.form__input:focus {
-    box-shadow: inset 4px 4px 4px var(--neu-2), inset -4px -4px 4px var(--white);
-}
-
-.options {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 12px;
-    margin-bottom: 10px;
-}
-
-.options a {
-    color: var(--purple);
-    text-decoration: none;
-}
-
-.options a:hover {
-    text-decoration: underline;
+    border: none;
+    outline: none;
 }
 
 .button {
     width: 100%;
     height: 45px;
     border-radius: 20px;
-    margin-top: 15px;
-    font-weight: 700;
-    font-size: 14px;
     background-color: var(--purple);
     color: var(--white);
     border: none;
-    outline: none;
     cursor: pointer;
-    box-shadow: 6px 6px 12px var(--neu-2), -6px -6px 12px var(--white);
+    margin-top: 15px;
+    font-weight: 700;
+    font-size: 14px;
     transition: transform 0.2s ease;
 }
 
 .button:hover {
     transform: scale(1.02);
-    box-shadow: 4px 4px 8px var(--neu-2), -4px -4px 8px var(--white);
 }
 
 .error-message {
     color: red;
     font-size: 12px;
     margin-top: 10px;
-    text-align: center;
 }
 
-/* Estilos adicionales específicos para el dashboard */
-.dashboard-container {
+.navbar-header {
+    background: linear-gradient(to right, #08112F, #3E53A0, #5A77DF);
     display: flex;
-    height: calc(100vh - 70px);
+    align-items: center;
+    padding: 0 20px;
+    height: 70px;
+    color: var(--white);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    box-sizing: border-box;
     width: 100%;
-    margin-top: 70px;
+    border-bottom-left-radius: 20px; /* Ajusta el valor del radio como prefieras */
+    border-bottom-right-radius: 20px; /* Ajusta el valor del radio como prefieras */
 }
 
-.dashboard-sidebar {
+.navbar-logo {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-logo img {
+    height: 50px;
+    margin-right: 10px;
+}
+
+.navbar-header h2 {
+    font-size: 24px;
+    color: var(--white);
+    margin: 0;
+}
+
+.navbar-user {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+
+.navbar-user span {
+    margin-right: 10px;
+    color: var(--white);
+}
+
+.user-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+}
+
+#accordian {
+    background-color: #4B70E2; /* Color de fondo del sidebar */
     width: 250px;
-    padding: 20px;
-    background-color: var(--sidebar-bg);
-    color: var(--sidebar-text);
-    border-radius: 16px;
-    box-shadow: 4px 0 10px var(--neu-2);
+    height: 100vh;
+    overflow-x: hidden;
+    position: fixed;
+    top: 53px;
+    left: 0; /* Asegura que el sidebar esté pegado al borde izquierdo */
+    z-index: 1;
+    box-sizing: border-box;
 }
 
-.dashboard-sidebar nav ul {
+#accordian ul {
     list-style: none;
     padding: 0;
 }
 
-.dashboard-sidebar nav ul li {
-    margin: 10px 0;
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    border-radius: 8px;
-    transition: background-color 0.3s ease;
+#accordian ul li {
+    margin-bottom: 10px;
 }
 
-.dashboard-sidebar nav ul li:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+.main-navbar {
+    position: relative;
 }
 
-.dashboard-sidebar nav ul li a {
+#accordian ul li a {
+    color: rgba(255, 255, 255, 0.7);
     text-decoration: none;
-    color: var(--sidebar-text);
-    font-size: 14px;
+    font-size: 15px;
+    line-height: 45px;
     display: flex;
     align-items: center;
-    width: 100%;
+    padding: 0px 20px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    border-top-left-radius: 25px;
+    border-bottom-left-radius: 25px;
 }
 
-.dashboard-sidebar nav ul li a .icon {
-    width: 24px;
-    height: 24px;
+#accordian ul li a i {
     margin-right: 10px;
-    vertical-align: middle;
-    fill: var(--sidebar-text);
-    display: inline-block;
+    font-size: 18px;
+}
+
+#accordian ul li a.active {
+    background-color: #ecf0f3; /* Fondo para el enlace activo */
+    color: #4B70E2; /* Color del texto activo */
+    font-weight: bold;
 }
 
 
-/* Ejemplo de iconos usando FontAwesome */
-.dashboard-sidebar nav ul li a .icon-dashboard::before {
-    content: "\f015"; /* icono de dashboard */
-    font-family: "Font Awesome 5 Free";
-    font-weight: 900;
+/* Estilo de hover solo si el enlace no tiene la clase 'active' */
+#accordian ul li a:hover:not(.active) {
+    background-color: #ecf0f3; /* Color de fondo al pasar el mouse */
+    color: var(--sbar-bg); /* Cambia el color del texto para que contraste */
 }
 
-.dashboard-sidebar nav ul li a .icon-validators::before {
-    content: "\f542"; /* icono de validadores */
-    font-family: "Font Awesome 5 Free";
-    font-weight: 900;
-}
 
-.dashboard-sidebar nav ul li a .icon-sims::before {
-    content: "\f2a1"; /* icono de SIMs */
-    font-family: "Font Awesome 5 Free";
-    font-weight: 900;
-}
 
-.dashboard-sidebar nav ul li a .icon-movements::before {
-    content: "\f0e7"; /* icono de movimientos */
-    font-family: "Font Awesome 5 Free";
-    font-weight: 900;
-}
-
-.dashboard-sidebar nav ul li a .icon-alerts::before {
-    content: "\f071"; /* icono de alertas */
-    font-family: "Font Awesome 5 Free";
-    font-weight: 900;
-}
-
-.dashboard-sidebar nav ul li a .icon-settings::before {
-    content: "\f013"; /* icono de configuración */
-    font-family: "Font Awesome 5 Free";
-    font-weight: 900;
+.dashboard-container {
+    display: flex;
+    justify-content: start; /* Alinea hacia la izquierda */
+    padding-top: 20px;
+    height: calc(100vh - 70px);
+    width: 100%;
+    margin-top: 0px;
 }
 
 .dashboard-main {
-    flex: 1;
-    padding: 40px;
+    padding-left: 260px; /* Ajusta el espacio con el sidebar */
+    padding-top: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: var(--bg);
+    width: calc(100% - 260px);
+    background-color: #ecf0f3; /* Fondo blanco */
+    margin-top: 10px;
+    box-shadow: none; /* Elimina cualquier sombra */
+    border-radius: 0; /* Elimina el borde redondeado */
 }
 
-.dashboard-header {
-    width: 100%;
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.dashboard-header h1 {
-    font-size: 24px;
-    color: var(--black);
-}
-
-/* Contenedores del dashboard alineados */
 .dashboard-metrics {
     display: flex;
     gap: 20px;
@@ -279,7 +233,6 @@ body {
     color: var(--black);
 }
 
-/* Distribución de los gráficos en dos columnas */
 .dashboard-charts {
     display: flex;
     gap: 20px;
@@ -307,71 +260,11 @@ body {
     box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Estilos para la barra de navegación superior (navbar) */
-.navbar-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 70px;
-    background: linear-gradient(to right, #08112F, #3E53A0, #5A77DF);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 20px;
-    border-radius: 0 0 16px 16px;
-    box-shadow: 0px 2px 10px var(--neu-2);
-    color: var(--white);
-    z-index: 10;
-}
-
-.navbar-header .navbar-logo img {
-    height: 50px;
-    width: auto;
-    margin-right: 10px;
-}
-
-.navbar-header h2 {
+/* Estilos compartidos para encabezados */
+.dashboard-header {
     font-size: 24px;
-    color: var(--white);
-}
-
-.navbar-user {
-    display: flex;
-    align-items: center;
-    margin-left: auto;
-}
-
-.navbar-user span {
-    margin-right: 10px;
-    color: var(--white);
-}
-
-.navbar-logo {
-    display: flex;
-    align-items: center;
-}
-
-.navbar-logo h2 {
-    margin-left: 10px;
+    font-weight: bold;
+    color: #000; /* Cambiado a negro */
     text-align: center;
-    line-height: 1; /* Ajusta la altura de línea si es necesario */
-}
-
-.user-icon {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-}
-
-.recover-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-}
-
-.recover-logo {
-    width: 80px; /* Ajusta el tamaño según sea necesario */
-    margin-bottom: 10px; /* Espacio entre el logo y el título */
+    margin-bottom: 20px;
 }

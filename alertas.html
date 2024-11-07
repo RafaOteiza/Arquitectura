@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alertas</title>
+    <link rel="stylesheet" href="css/views.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div id="navbar-container"></div>
+    <div class="dashboard-container d-flex">
+        <div id="sidebar-container"></div>
+        <main class="dashboard-main flex-fill">
+            <h1 class="dashboard-header">Consultar Estado de Alertas</h1>
+            </header>
+
+            <!-- Tabla de alertas -->
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Fecha</th>
+                            <th>Descripción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>A001</td>
+                            <td>14-03-2024</td>
+                            <td>Error en la asociación de SIMs</td>
+                        </tr>
+                        <tr>
+                            <td>A002</td>
+                            <td>12-03-2024</td>
+                            <td>Validador en mantenimiento programado</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Contenedor inferior -->
+            <div class="bottom-section">
+                <!-- Botones de acción para todas las alertas -->
+                <div class="actions-left">
+                    <button class="outline-btn mark-all-read-btn">Marcar Todas como Leídas</button>
+                    <button class="outline-btn delete-all-btn">Eliminar Todas</button>
+                </div>
+
+                <!-- Control para marcar/eliminar alerta específica -->
+                <div class="control-box">
+                    <h3>Marcar o Eliminar Alerta</h3>
+                    <label for="alert-id">ID de Alerta:</label>
+                    <input type="text" id="alert-id" placeholder="Ingrese ID de Alerta">
+                    
+                    <button class="mark-read-btn">Marcar como Leída</button>
+                    <button class="delete-alert-btn">Eliminar</button>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="js/main.js"></script>
+    <script>
+        fetch('navbar.html')
+            .then(response => response.text())
+            .then(data => document.getElementById('navbar-container').innerHTML = data)
+            .catch(error => console.error('Error al cargar navbar:', error));
+        
+        fetch('sidebar.html')
+            .then(response => response.text())
+            .then(data => document.getElementById('sidebar-container').innerHTML = data)
+            .catch(error => console.error('Error al cargar sidebar:', error));
+    </script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movimientos</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/views.css">
+</head>
+<body>
+    <div id="navbar-container"></div>
+    <div class="dashboard-container d-flex">
+        <div id="sidebar-container"></div>
+        <main class="dashboard-main flex-fill">
+            <h1 class="dashboard-header">Movimientos</h1>
+            </header>
+
+            <section class="filters">
+                <label for="date">Fecha:</label>
+                <input type="text" id="date" placeholder="Dd / mm / yyyy">
+                <label for="movement-type">Tipo de movimiento:</label>
+                <select id="movement-type">
+                    <option value="all">Todos</option>
+                    <option value="en-reparacion">En reparación</option>
+                    <option value="en-ruta">En ruta</option>
+                    <option value="en-funcionamiento">En funcionamiento</option>
+                    <option value="reparado">Reparado</option>
+                </select>
+            </section>
+
+            <section class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Dispositivo</th>
+                            <th>Cantidad</th>
+                            <th>Tipo de Movimiento</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Datos de ejemplo -->
+                        <tr>
+                            <td>Validador #034452</td>
+                            <td>40</td>
+                            <td>En reparación</td>
+                            <td><input type="checkbox" checked disabled></td>
+                        </tr>
+                        <tr>
+                            <td>Validador #034452</td>
+                            <td>38</td>
+                            <td>En ruta</td>
+                            <td><input type="checkbox" checked disabled></td>
+                        </tr>
+                        <tr>
+                            <td>Validador #032332</td>
+                            <td>41</td>
+                            <td>En funcionamiento</td>
+                            <td><input type="checkbox" checked disabled></td>
+                        </tr>
+                        <tr>
+                            <td>Validador #032222</td>
+                            <td>22</td>
+                            <td>Reparado</td>
+                            <td><input type="checkbox" disabled></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <div class="toggle-container">
+                <label for="data-toggle">Ocultar datos:</label>
+                <input type="checkbox" id="data-toggle">
+            </div>
+
+            <div class="actions">
+                <button class="extract-report-btn">Extraer Reporte</button>
+            </div>
+        </main>
+    </div>
+    <script src="js/main.js"></script>
+    <script>
+        fetch('navbar.html').then(res => res.text()).then(data => document.getElementById('navbar-container').innerHTML = data);
+        fetch('sidebar.html').then(res => res.text()).then(data => document.getElementById('sidebar-container').innerHTML = data);
+    </script>
+</body>
+</html>
