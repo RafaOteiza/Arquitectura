@@ -6,6 +6,20 @@
     <title>Configuración de Usuario</title>
     <link rel="stylesheet" href="css/views.css">
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .user-image-container {
+            text-align: center;
+        }
+        .profile-picture {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .file-input {
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <div id="navbar-container"></div>
@@ -13,15 +27,15 @@
         <div id="sidebar-container"></div>
         <main class="dashboard-main flex-fill">
             <h1 class="dashboard-header">Configuración de Usuario</h1>
-            </header>
 
             <div class="main-content-profile">
                 <!-- Sección de imagen de usuario -->
                 <div class="user-image-section">
                     <div class="user-image-container">
-                        <img src="img/default-profile.png" alt="Foto de perfil" class="profile-picture">
+                        <img src="img/default-profile.png" alt="Foto de perfil" id="profilePicture" class="profile-picture">
                         <p class="user-occupation">Ocupación: Analista</p>
-                        <button class="change-image-btn">Cambiar Imagen</button>
+                        <button class="change-image-btn" onclick="document.getElementById('fileInput').click()">Cambiar Imagen</button>
+                        <input type="file" id="fileInput" class="file-input" accept="image/*" onchange="loadImage(event)">
                     </div>
                 </div>
 
@@ -56,6 +70,18 @@
             .then(response => response.text())
             .then(data => document.getElementById('sidebar-container').innerHTML = data)
             .catch(error => console.error('Error al cargar sidebar:', error));
+
+        // Función para cargar y previsualizar la imagen
+        function loadImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profilePicture').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
     </script>
 </body>
 </html>
