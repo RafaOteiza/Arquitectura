@@ -3,59 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consultar Estado SIM</title>
+    <title>Gestión de SIMs</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/views.css">
 </head>
 <body>
     <div id="navbar-container"></div>
     <div class="dashboard-container d-flex">
-        <div id="sidebar-container"></div>
+        <div id="sidebar-container"></div> <!-- Contenedor para cargar la sidebar -->
+
         <main class="dashboard-main flex-fill">
-            <h1 class="dashboard-header">Consultar Estado SIM</h1>
-            </header>
+            <h1 class="dashboard-header">Consultar y Gestionar SIMs</h1>
+            <div class="main-content">
+                <!-- Sección de consulta de SIMs -->
+                <div class="table-section">
+                    <label for="search-msisdn">Buscar por MSISDN:</label>
+                    <input type="text" id="search-msisdn" placeholder="Ingrese MSISDN">
+                    <label for="search-iccid">Buscar por ICCID:</label>
+                    <input type="text" id="search-iccid" placeholder="Ingrese ICCID">
+                    <button class="search-sim-btn">Buscar SIM</button>
+                    
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>ICCID</th>
+                                <th>Fecha Ingreso</th>
+                                <th>Estado</th>
+                                <th>Ubicación</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Las filas se llenarán dinámicamente desde main.js -->
+                        </tbody>
+                    </table>
+                    <div class="footer-buttons">
+                        <button class="report-button">Extraer Reporte</button>
+                    </div>
+                </div>
 
-            <section class="filters">
-                <label for="start-date">Fecha Inicio:</label>
-                <input type="text" id="start-date" placeholder="dd/mm/yy">
-                <label for="end-date">Fecha Fin:</label>
-                <input type="text" id="end-date" placeholder="dd/mm/yy">
-                <label for="sim-number">N° SIM:</label>
-                <input type="text" id="sim-number" placeholder="N° SIM">
-                <button class="extract-report-btn">Extraer Reporte</button>
-            </section>
+                <!-- Sección de controles -->
+                <div class="controls-section">
+                    <!-- Agregar Nueva SIM -->
+                    <div class="control-box">
+                        <h3>Agregar Nueva SIM</h3>
+                        <label for="new-iccid">ICCID:</label>
+                        <input type="text" id="new-iccid">
+                        <label for="entry-date">Fecha de Ingreso:</label>
+                        <input type="text" id="entry-date" placeholder="dd/mm/yyyy">
+                        <button class="add-sim-btn">Agregar SIM</button>
+                    </div>
 
-            <section class="table-container">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Tipo de Movimiento</th>
-                            <th>Estado SIM</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Filas de ejemplo, los datos reales deben ser cargados dinámicamente -->
-                        <tr>
-                            <td>14-03-2024</td>
-                            <td>Activación</td>
-                            <td>Disponible</td>
-                        </tr>
-                        <tr>
-                            <td>12-03-2024</td>
-                            <td>Desactivación</td>
-                            <td>En reparación</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </section>
-
-            <div class="toggle-container">
-                <label for="data-toggle">Ocultar datos:</label>
-                <input type="checkbox" id="data-toggle">
+                    <!-- Asociar/Disociar MSISDN -->
+                    <div class="control-box">
+                        <h3>Asociar/Disociar MSISDN</h3>
+                        <label for="sim-iccid">ICCID de la SIM:</label>
+                        <input type="text" id="sim-iccid">
+                        <label for="msisdn">MSISDN:</label>
+                        <input type="text" id="msisdn">
+                        <div class="footer-buttons">
+                            <button class="associate-btn">Asociar</button>
+                            <button class="disassociate-btn">Disociar</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
+
     <script src="js/main.js"></script>
     <script>
         fetch('navbar.html').then(res => res.text()).then(data => document.getElementById('navbar-container').innerHTML = data);
