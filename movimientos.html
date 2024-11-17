@@ -6,6 +6,31 @@
     <title>Movimientos</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/views.css">
+    <style>
+        /* Estilos para el botón y la lista desplegable */
+        .extract-report-container {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .extract-report-btn {
+            background-color: #4CAF50; /* Cambia el color según tus estilos */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        .format-select {
+            font-size: 16px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     <div id="navbar-container"></div>
@@ -13,11 +38,11 @@
         <div id="sidebar-container"></div>
         <main class="dashboard-main flex-fill">
             <h1 class="dashboard-header">Movimientos</h1>
-            </header>
 
             <section class="filters">
                 <label for="date">Fecha:</label>
-                <input type="text" id="date" placeholder="Dd / mm / yyyy">
+                <input type="date" id="date" placeholder="dd/mm/yyyy">
+                
                 <label for="movement-type">Tipo de movimiento:</label>
                 <select id="movement-type">
                     <option value="all">Todos</option>
@@ -29,7 +54,7 @@
             </section>
 
             <section class="table-container">
-                <table class="data-table">
+                <table class="data-table" id="movements-table">
                     <thead>
                         <tr>
                             <th>Dispositivo</th>
@@ -73,15 +98,109 @@
                 <input type="checkbox" id="data-toggle">
             </div>
 
+            <!-- Botón y lista desplegable para seleccionar el formato -->
             <div class="actions">
-                <button class="extract-report-btn">Extraer Reporte</button>
+                <div class="extract-report-container">
+                    <button class="extract-report-btn" id="extract-report-btn">Extraer Reporte</button>
+                    <select id="report-format" class="format-select">
+                        <option value="csv">CSV</option>
+                        <option value="excel">Excel</option>
+                        <option value="pdf">PDF</option>
+                    </select>
+                </div>
             </div>
         </main>
     </div>
+
+    <!-- Agregar scripts de librerías externas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
     <script src="js/main.js"></script>
     <script>
+        // Cargar contenido del navbar y sidebar
         fetch('navbar.html').then(res => res.text()).then(data => document.getElementById('navbar-container').innerHTML = data);
         fetch('sidebar.html').then(res => res.text()).then(data => document.getElementById('sidebar-container').innerHTML = data);
+
+        // Evento para exportar en el formato seleccionado
+        document.getElementById("extract-report-btn").addEventListener("click", function () {
+            const format = document.getElementById("report-format").value;
+
+            if (format === "csv") {
+                exportToCSV();
+            } else if (format === "excel") {
+                exportToExcel();
+            } else if (format === "pdf") {
+                exportToPDF();
+            }
+        });
+
+        // Exportar a CSV
+        function exportToCSV() {
+            const table = document.getElementById("movements-table");
+            let csvContent = "";
+            
+            for (let row of table.rows) {
+                let rowData = [];
+                for (let cell of row.cells) {
+                    if (cell.children.length && cell.children[0].type === "checkbox") {
+                        rowData.push(cell.children[0].checked ? "Sí" : "No");
+                    } else {
+                        rowData.push(cell.innerText);
+                    }
+                }
+                csvContent += rowData.join(",") + "\n";
+            }
+
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "reporte_movimientos.csv";
+            link.style.display = "none";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Exportar a Excel
+        function exportToExcel() {
+            const table = document.getElementById("movements-table");
+            const worksheet = XLSX.utils.table_to_sheet(table);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Movimientos");
+
+            XLSX.writeFile(workbook, "reporte_movimientos.xlsx");
+        }
+
+        // Exportar a PDF
+        function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            const table = document.getElementById("movements-table");
+            let data = [];
+
+            for (let row of table.rows) {
+                let rowData = [];
+                for (let cell of row.cells) {
+                    if (cell.children.length && cell.children[0].type === "checkbox") {
+                        rowData.push(cell.children[0].checked ? "Sí" : "No");
+                    } else {
+                        rowData.push(cell.innerText);
+                    }
+                }
+                data.push(rowData);
+            }
+
+            doc.text("Reporte de Movimientos", 10, 10);
+            doc.autoTable({
+                head: [["Dispositivo", "Cantidad", "Tipo de Movimiento", "Estado"]],
+                body: data,
+                startY: 20
+            });
+
+            doc.save("reporte_movimientos.pdf");
+        }
     </script>
 </body>
 </html>

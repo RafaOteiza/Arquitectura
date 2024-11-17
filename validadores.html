@@ -6,6 +6,17 @@
     <title>Gestión de Validadores</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/views.css">
+    <style>
+        /* Asegura que todos los inputs y selects tengan el mismo tamaño */
+        .controls-section input[type="text"],
+        .controls-section input[type="date"],
+        .controls-section select {
+            width: 100%; /* Ajusta el ancho para que todos los elementos ocupen el mismo espacio */
+            box-sizing: border-box; /* Asegura que el padding no afecte el ancho total */
+            padding: 8px; /* Espacio interno */
+            margin-bottom: 10px; /* Espacio entre cada campo */
+        }
+    </style>
 </head>
 <body>
     <div id="navbar-container"></div>
@@ -92,7 +103,7 @@
                             <!-- Otros modelos aquí -->
                         </select>
                         <label for="entry-date">Fecha Ingreso Validador:</label>
-                        <input type="text" id="entry-date" placeholder="dd/mm">
+                        <input type="date" id="entry-date" placeholder="dd/mm">
                         <label for="observation">Observación:</label>
                         <input type="text" id="observation">
                         <button>Enviar</button>
