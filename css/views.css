@@ -33,10 +33,13 @@ body {
     width: 90%;
     margin: 0 auto; /* Centra la tabla en la página */
     padding: 20px;
+    border-radius: 4px; /* Bordes redondeados */
 }
 
 .table-section {
     width: 70%;
+    border-radius: 4px; /* Bordes redondeados */
+    overflow: hidden; /* Asegura que el contenido no sobresalga */
 }
 
 .table-section table {
@@ -45,6 +48,7 @@ body {
     background-color: #fff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
+    border-radius: 4px; /* Bordes redondeados */
 }
 
 .table-section th, .table-section td {
@@ -159,6 +163,8 @@ body {
     width: 100%;
     border-collapse: collapse;
     background-color: white;
+    border-radius: 4px; /* Bordes redondeados de 4px */
+    overflow: hidden; /* Asegura que el contenido no sobresalga del radio */
 }
 
 .data-table th, .data-table td {
@@ -460,3 +466,4 @@ button.extract-report-btn:hover {
     text-align: center;
     margin-bottom: 20px;
 }
+

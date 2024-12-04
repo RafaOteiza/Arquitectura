@@ -1,178 +1,112 @@
-// Función de Login
-function login(event) {
-    event.preventDefault();
+// Configuración de enlaces del menú lateral (sidebar)
+const sidebarLinks = document.querySelectorAll("#accordian ul li a");
+const currentPage = window.location.pathname.split("/").pop();
+
+// Recuperar el enlace activo guardado en localStorage o usar la página actual
+const activeLink = localStorage.getItem("activeLink") || currentPage;
+
+sidebarLinks.forEach(link => {
+    // Aplicar la clase 'active' al enlace correspondiente
+    if (link.getAttribute("href") === activeLink) {
+        link.classList.add("active");
+    }
+
+    // Evento para guardar el enlace activo en localStorage al hacer clic
+    link.addEventListener("click", function () {
+        sidebarLinks.forEach(item => item.classList.remove("active"));
+        link.classList.add("active");
+        localStorage.setItem("activeLink", link.getAttribute("href"));
+    });
+});
+
+// Mostrar notificaciones (útil para errores o mensajes de éxito)
+function showNotification(message, type) {
+    const loginError = document.getElementById("loginError");
+
+    if (loginError) {
+        // Aplicar el mensaje y el estilo
+        loginError.textContent = message;
+        loginError.style.color = type === "error" ? "red" : "green"; // Cambiar el color según el tipo
+    } else {
+        console.warn("No se encontró el elemento para mostrar notificaciones.");
+    }
+}
+
+async function login(event) {
+    event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
+
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
-    if (username === "admin" && password === "1234") {
-        window.location.href = "dashboard.html";
-    } else {
-        document.getElementById("loginError").innerText = "Credenciales incorrectas";
-    }
-}
 
-// Función de Recuperación de Contraseña
-function recoverPassword(event) {
-    event.preventDefault();
-    const email = document.getElementById("email").value;
-
-    if (email) {
-        alert("Se ha enviado un enlace de recuperación a " + email);
-        window.location.href = "index.html";
-    } else {
-        alert("Por favor, ingresa un correo electrónico válido.");
-    }
-}
-
-// URL base del backend para la API de SIMs
-const API_BASE_URL = "http://127.0.0.1:8001/sims";
-
-// Función para consultar SIMs por MSISDN o ICCID
-function searchSIMs() {
-    const msisdn = document.getElementById("search-msisdn").value;
-    const iccid = document.getElementById("search-iccid").value;
-
-    let url = `${API_BASE_URL}/sim-msisdn/?search=`;
-    if (msisdn && !iccid) {
-        url += msisdn;
-    } else if (iccid && !msisdn) {
-        url += iccid;
-    } else if (msisdn && iccid) {
-        alert("Por favor, busca por MSISDN o ICCID, no ambos.");
+    if (!username || !password) {
+        showNotification("Por favor, completa todos los campos.", "error");
         return;
     }
 
-    fetch(url)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('No se encontraron datos');
-            }
-            return response.json();
-        })
-        .then(data => {
-            const tableBody = document.querySelector(".data-table tbody");
-            tableBody.innerHTML = ""; // Limpiar el contenido actual
+    try {
+        // Realizar la solicitud al backend con los parámetros de correo y contraseña
+        const response = await fetch(`http://127.0.0.1:8000/usuarios/usuarios/?correo=${username}&contraseña=${password}`);
+        if (response.ok) {
+            const data = await response.json();
 
-            if (Array.isArray(data) && data.length > 0) {
-                data.forEach(sim => {
-                    const row = document.createElement("tr");
-                    row.innerHTML = `
-                        <td>${sim.id || "N/A"}</td>
-                        <td>${sim.iccid || "N/A"}</td>
-                        <td>${sim.fecha_creacion || "N/A"}</td>
-                        <td>${sim.id_estado?.nombre_estado || "N/A"}</td>
-                        <td>${sim.ubicacion || "LAB DEV"}</td>
-                    `;
-                    tableBody.appendChild(row);
-                });
+            if (data.length > 0) {
+                // Guardar los datos del usuario correcto en localStorage
+                console.log("Usuario logueado:", data[0]); // Depuración
+                localStorage.setItem("user", JSON.stringify(data[0]));
+
+                // Redirigir al usuario a la página principal
+                window.location.href = "dashboard.html";
             } else {
-                const row = document.createElement("tr");
-                row.innerHTML = `<td colspan="5">No se encontraron resultados</td>`;
-                tableBody.appendChild(row);
+                showNotification("Credenciales incorrectas. Por favor, inténtalo nuevamente.", "error");
             }
-        })
-        .catch(error => {
-            console.error('Error al consultar SIMs:', error);
-            const tableBody = document.querySelector(".data-table tbody");
-            tableBody.innerHTML = `<tr><td colspan="5">Error al cargar datos</td></tr>`;
-        });
-}
-
-
-// Función para agregar una nueva SIM
-function addSIM() {
-    const iccid = document.getElementById("new-iccid").value;
-    const fecha_ingreso = document.getElementById("entry-date").value;
-    const estado = 1; // Suponiendo que el ID para 'En espera de asignación' es 1 en `EstadoSim`
-    const ubicacion = "LAB DEV";
-
-    const simData = { iccid, fecha_ingreso, id_estado: estado, ubicacion };
-
-    fetch(`${API_BASE_URL}/sim-msisdn/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(simData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        alert("SIM agregada con éxito");
-        searchSIMs(); // Actualizar lista de SIMs
-    })
-    .catch(error => console.error('Error al agregar SIM:', error));
-}
-
-// Función para asociar un MSISDN a una SIM
-function associateMSISDN() {
-    const iccid = document.getElementById("sim-iccid").value;
-    const msisdn = document.getElementById("msisdn").value;
-
-    const associationData = { iccid, msisdn };
-
-    fetch(`${API_BASE_URL}/sim-msisdn/associate/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(associationData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        alert("MSISDN asociado con éxito");
-    })
-    .catch(error => console.error('Error al asociar MSISDN:', error));
-}
-
-// Función para disociar un MSISDN de una SIM
-function disassociateMSISDN() {
-    const iccid = document.getElementById("sim-iccid").value;
-    const msisdn = document.getElementById("msisdn").value;
-
-    fetch(`${API_BASE_URL}/sim-msisdn/disassociate/`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ iccid, msisdn })
-    })
-    .then(response => response.json())
-    .then(data => {
-        alert("MSISDN disociado con éxito");
-    })
-    .catch(error => console.error('Error al disociar MSISDN:', error));
-}
-
-// Eventos de botones
-document.addEventListener("DOMContentLoaded", function() {
-    document.querySelector(".search-sim-btn").addEventListener("click", searchSIMs);
-    document.querySelector(".add-sim-btn").addEventListener("click", addSIM);
-    document.querySelector(".associate-btn").addEventListener("click", associateMSISDN);
-    document.querySelector(".disassociate-btn").addEventListener("click", disassociateMSISDN);
-});
-
-// Evento para ejecutar funciones al cargar la página
-document.addEventListener("DOMContentLoaded", function() {
-    // Cargar datos de estado de SIM automáticamente
-    fetchEstadoSim();
-
-    // Agregar evento para el botón "Extraer Reporte" para los filtros de fecha y SIM
-    const reportButton = document.querySelector(".extract-report-btn");
-    if (reportButton) {
-        reportButton.addEventListener("click", fetchFilteredReport);
-    }
-
-    // Gestión de enlaces de la barra lateral
-    const sidebarLinks = document.querySelectorAll("#accordian ul li a");
-    const currentPage = window.location.pathname.split("/").pop();
-
-    // Recupera el enlace activo guardado en localStorage o usa la página actual
-    const activeLink = localStorage.getItem("activeLink") || currentPage;
-
-    sidebarLinks.forEach(link => {
-        // Aplica la clase 'active' al enlace correspondiente
-        if (link.getAttribute("href") === activeLink) {
-            link.classList.add("active");
+        } else {
+            showNotification("Error en el servidor. Inténtalo más tarde.", "error");
         }
+    } catch (error) {
+        console.error("Error al conectar con el servidor:", error);
+        showNotification("No se pudo conectar con el servidor. Por favor, inténtalo más tarde.", "error");
+    }
+}
 
-        // Evento para guardar el enlace activo en localStorage al hacer clic
-        link.addEventListener("click", function() {
-            sidebarLinks.forEach(item => item.classList.remove("active"));
-            link.classList.add("active");
-            localStorage.setItem("activeLink", link.getAttribute("href"));
-        });
-    });
+
+
+
+// Función para cerrar sesión
+function logout() {
+    // Eliminar los datos del usuario almacenados en localStorage
+    localStorage.removeItem("user");
+
+    // Redirigir al usuario a la página de inicio de sesión
+    window.location.href = "index.html";
+}
+
+// Función para cargar el nombre o correo del usuario en el navbar
+document.addEventListener("DOMContentLoaded", async () => {
+    const userNameElement = document.getElementById("user-name");
+    const user = JSON.parse(localStorage.getItem("user")); // Obtener usuario desde localStorage
+
+    if (userNameElement) {
+        if (user && user.id) {
+            try {
+                // Obtener datos completos del usuario desde el backend
+                const response = await fetch(`http://127.0.0.1:8000/usuarios/usuarios/${user.id}/`);
+                if (response.ok) {
+                    const userData = await response.json();
+
+                    // Mostrar el nombre completo o el correo
+                    userNameElement.textContent = userData.nombre
+                        ? `${userData.nombre} ${userData.apellido}`
+                        : userData.correo || "Usuario desconocido";
+                } else {
+                    console.error("No se pudo obtener los datos del usuario desde el backend.");
+                    userNameElement.textContent = "Error al cargar usuario";
+                }
+            } catch (error) {
+                console.error("Error al conectar con el backend:", error);
+                userNameElement.textContent = "Error de conexión";
+            }
+        } else {
+            userNameElement.textContent = "No autenticado";
+        }
+    }
 });

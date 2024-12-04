@@ -7,121 +7,133 @@
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/views.css">
     <style>
-        /* Asegura que todos los inputs y selects tengan el mismo tamaño */
         .controls-section input[type="text"],
         .controls-section input[type="date"],
         .controls-section select {
-            width: 100%; /* Ajusta el ancho para que todos los elementos ocupen el mismo espacio */
-            box-sizing: border-box; /* Asegura que el padding no afecte el ancho total */
-            padding: 8px; /* Espacio interno */
-            margin-bottom: 10px; /* Espacio entre cada campo */
+            width: 100%;
+            box-sizing: border-box;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+
+        /* Estilo para notificaciones */
+        #notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .notification {
+            padding: 15px;
+            border-radius: 5px;
+            color: #fff;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: translateY(-20px);
+        }
+
+        .notification.success {
+            background-color: #28a745;
+        }
+
+        .notification.error {
+            background-color: #dc3545;
+        }
+
+        /* Botones ajustados */
+        .footer-buttons button {
+            margin: 5px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .footer-buttons .report-button {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .footer-buttons .upload-button {
+            background-color: #28a745;
+            color: white;
         }
     </style>
 </head>
 <body>
     <div id="navbar-container"></div>
     <div class="dashboard-container d-flex">
-        <div id="sidebar-container"></div> <!-- Contenedor para cargar la sidebar -->
-
+        <div id="sidebar-container"></div>
         <main class="dashboard-main flex-fill">
             <h1 class="dashboard-header">Consultar Estado Validadores</h1>
             <div class="main-content">
-                <!-- Sección de la tabla de validadores -->
                 <div class="table-section">
                     <table>
-                        <tr>
-                            <th>AMID</th>
-                            <th>Fecha Último Movimiento</th>
-                            <th>Estado</th>
-                            <th>Ubicación</th>
-                        </tr>
-                        <tr>
-                            <td>749RU23</td>
-                            <td>14-03-2024</td>
-                            <td>Disponible</td>
-                            <td>Zonas Pagas</td>
-                        </tr>
-                        <tr>
-                            <td>723Q9R0</td>
-                            <td>01-02-2021</td>
-                            <td>En reparación</td>
-                            <td>Garantía</td>
-                        </tr>
-                        <tr>
-                            <td>745H5J3</td>
-                            <td>05-04-2023</td>
-                            <td>En custodia</td>
-                            <td>Zonas Pagas</td>
-                        </tr>
-                        <tr>
-                            <td>7419Q20</td>
-                            <td>12-12-2023</td>
-                            <td>Préstamo</td>
-                            <td>Sonda</td>
-                        </tr>
-                        <tr>
-                            <td>729UQ23</td>
-                            <td>14-03-2024</td>
-                            <td>Disponible</td>
-                            <td>LAB-DEV</td>
-                        </tr>
+                        <thead>
+                            <tr>
+                                <th>AMID</th>
+                                <th>Fecha Último Movimiento</th>
+                                <th>Estado</th>
+                                <th>Ubicación</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
                     </table>
                     <div class="footer-buttons">
                         <button class="report-button">Extraer Reporte</button>
                         <button class="upload-button">Carga Masiva</button>
                     </div>
                 </div>
-
-                <!-- Sección de controles -->
                 <div class="controls-section">
-                    <!-- Cambiar Estado Validador -->
                     <div class="control-box">
                         <h3>Cambiar Estado Validador</h3>
                         <label for="change-amid">Ingresar Amid:</label>
                         <input type="text" id="change-amid">
                         <label for="new-status">Seleccionar Nuevo Estado:</label>
-                        <select id="new-status">
-                            <option>Disponible</option>
-                            <option>En reparación</option>
-                            <option>En custodia</option>
-                            <option>Préstamo</option>
-                        </select>
-                        <button>Enviar</button>
+                        <select id="new-status"></select>
+                        <button class="change-status-btn">Enviar</button>
                     </div>
-
-                    <!-- Agregar Nuevo Validador -->
                     <div class="control-box">
                         <h3>Agregar Nuevo Validador</h3>
                         <label for="new-series">Ingresar Serie:</label>
                         <input type="text" id="new-series">
                         <label for="new-amid">Ingresar AMID:</label>
                         <input type="text" id="new-amid">
-                        <label for="new-model">Seleccionar Modelo de Validador:</label>
+                        <label for="new-model">Seleccionar Modelo:</label>
                         <select id="new-model">
                             <option>CV35</option>
                             <option>CV45</option>
-                            <!-- Otros modelos aquí -->
                         </select>
                         <label for="entry-date">Fecha Ingreso Validador:</label>
-                        <input type="date" id="entry-date" placeholder="dd/mm">
+                        <input type="date" id="entry-date">
                         <label for="observation">Observación:</label>
                         <input type="text" id="observation">
-                        <button>Enviar</button>
+                        <button class="add-validador-btn">Enviar</button>
                     </div>
                 </div>
             </div>
         </main>
     </div>
-    
+
+    <!-- Contenedor para notificaciones -->
+    <div id="notification-container"></div>
+
+    <!-- Librería SheetJS para generar Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
     <script src="js/main.js"></script>
+    <script type="module" src="js/validadores.js"></script>
     <script>
-        // Cargar el navbar
         fetch('navbar.html')
             .then(response => response.text())
             .then(data => document.getElementById('navbar-container').innerHTML = data)
             .catch(error => console.error('Error al cargar navbar:', error));
-        
-        // Cargar el sidebar
+
         fetch('sidebar.html')
             .then(response => response.text())
             .then(data => document.getElementById('sidebar-container').innerHTML = data)

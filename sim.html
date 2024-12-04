@@ -6,6 +6,89 @@
     <title>Gestión de SIMs</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/views.css">
+    <style>
+
+        .search-box {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+            width: calc(100% - 40px); /* Ajusta el ancho con margen */
+            max-width: 800px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Alinea los elementos horizontalmente */
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .search-box h3 {
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #333;
+            text-align: left;
+        }
+
+        .search-box label {
+            margin-right: 10px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .search-box input[type="text"] {
+            padding: 8px;
+            width: calc(50% - 10px); /* Divide el ancho entre MSISDN y ICCID */
+            margin-right: 10px; /* Espaciado entre inputs */
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        .search-box button {
+            padding: 10px;
+            background-color: #4b70e2;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            margin-left: 10px; /* Espaciado entre inputs y botón */
+        }
+
+        .search-box button:hover {
+            background-color: #3a5bb5;
+        }
+
+        /* Contenedor del botón "Extraer Reporte" */
+        .extract-report-container {
+            display: flex; /* Para centrar */
+            justify-content: center; /* Centra el botón horizontalmente */
+            margin-top: 20px; /* Espaciado superior con la tabla */
+        }
+
+        /* Estilo del botón "Extraer Reporte" */
+        .extract-report-btn {
+            background-color: #4CAF50; /* Color verde */
+            color: white; /* Texto en blanco */
+            border: none; /* Sin bordes */
+            padding: 10px 20px; /* Tamaño del botón */
+            cursor: pointer; /* Cambiar el puntero al pasar el mouse */
+            font-size: 16px; /* Tamaño del texto */
+            border-radius: 4px; /* Bordes redondeados */
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2); /* Sombra para resaltar */
+            transition: background-color 0.3s ease; /* Suaviza el cambio de color */
+        }
+
+        /* Efecto hover */
+        .extract-report-btn:hover {
+            background-color: #45a049; /* Color más oscuro al pasar el mouse */
+        }
+        
+    </style>
 </head>
 <body>
     <div id="navbar-container"></div>
@@ -17,28 +100,39 @@
             <div class="main-content">
                 <!-- Sección de consulta de SIMs -->
                 <div class="table-section">
-                    <label for="search-msisdn">Buscar por MSISDN:</label>
-                    <input type="text" id="search-msisdn" placeholder="Ingrese MSISDN">
-                    <label for="search-iccid">Buscar por ICCID:</label>
-                    <input type="text" id="search-iccid" placeholder="Ingrese ICCID">
-                    <button class="search-sim-btn">Buscar SIM</button>
+                    <div class="search-box">
+                        <div style="flex: 1; margin-right: 20px;">
+                            <label for="search-msisdn">MSISDN:</label>
+                            <input type="text" id="search-msisdn" placeholder="Ingrese MSISDN">
+                        </div>
+                        <div style="flex: 1; margin-right: 20px;">
+                            <label for="search-iccid">ICCID:</label>
+                            <input type="text" id="search-iccid" placeholder="Ingrese ICCID">
+                        </div>
+                        <div style="flex: 0;">
+                            <button class="search-sim-btn">Buscar</button>
+                        </div>
+                    </div>                                   
                     
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>ICCID</th>
-                                <th>Fecha Ingreso</th>
+                                <th>SIM (ICCID)</th>
+                                <th>MSISDN</th>
+                                <th>Fecha</th>
+                                <th>Nodo Concert</th>
+                                <th>Nodo Condor</th>
                                 <th>Estado</th>
-                                <th>Ubicación</th>
                             </tr>
                         </thead>
+                        <tbody></tbody>
                         <tbody>
                             <!-- Las filas se llenarán dinámicamente desde main.js -->
                         </tbody>
                     </table>
-                    <div class="footer-buttons">
-                        <button class="report-button">Extraer Reporte</button>
+                    <div id="pagination-container" class="pagination"></div>
+                    <div class="extract-report-container">
+                        <button class="extract-report-btn">Extraer Reporte</button>
                     </div>
                 </div>
 
@@ -49,8 +143,8 @@
                         <h3>Agregar Nueva SIM</h3>
                         <label for="new-iccid">ICCID:</label>
                         <input type="text" id="new-iccid">
-                        <label for="entry-date">Fecha de Ingreso:</label>
-                        <input type="text" id="entry-date" placeholder="dd/mm/yyyy">
+                        <label for="entry-date">Fecha Ingreso:</label>
+                        <input type="date" id="entry-date">
                         <button class="add-sim-btn">Agregar SIM</button>
                     </div>
 
@@ -71,7 +165,13 @@
         </main>
     </div>
 
+   <!-- Contenedor para notificaciones -->
+   <div id="notification-container"></div>
+
+   <!-- Librería SheetJS para manejar Excel -->
+   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
     <script src="js/main.js"></script>
+    <script type="module" src="js/sim.js"></script>
     <script>
         fetch('navbar.html').then(res => res.text()).then(data => document.getElementById('navbar-container').innerHTML = data);
         fetch('sidebar.html').then(res => res.text()).then(data => document.getElementById('sidebar-container').innerHTML = data);

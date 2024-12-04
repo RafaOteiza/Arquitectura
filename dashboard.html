@@ -5,6 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .dashboard-metrics {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .dashboard-card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .dashboard-card h3 {
+            font-size: 32px;
+            color: #4b70e2;
+        }
+
+        .dashboard-charts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .dashboard-chart {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            font-size: 18px;
+            color: #999;
+        }
+    </style>
 </head>
 <body>
     <div id="navbar-container"></div>
@@ -12,23 +53,62 @@
         <div id="sidebar-container"></div>
         <main class="dashboard-main flex-fill">
             <h1 class="dashboard-header">Resumen del Sistema</h1>
-            </header>
+
+            <!-- Métricas -->
             <section class="dashboard-metrics">
-                <div class="dashboard-card">Validadores Disponibles <h3>666</h3></div>
-                <div class="dashboard-card">SIMs Asociadas <h3>666</h3></div>
-                <div class="dashboard-card">Últimos Movimientos <h3>666</h3></div>
-                <div class="dashboard-card">Alertas Recientes <h3>666</h3></div>
+                <div class="dashboard-card" id="validadores-card">Validadores Disponibles <h3 id="validadores-count">Cargando...</h3></div>
+                <div class="dashboard-card" id="sims-card">SIMs Asociadas <h3 id="sims-count">Cargando...</h3></div>
+                <div class="dashboard-card" id="movimientos-card">Últimos Movimientos <h3 id="movimientos-count">Cargando...</h3></div>
+                <div class="dashboard-card" id="alertas-card">Alertas Recientes <h3 id="alertas-count">Cargando...</h3></div>
             </section>
+
+            <!-- Gráficos -->
             <section class="dashboard-charts">
                 <div class="dashboard-chart">Gráfico 1</div>
                 <div class="dashboard-chart">Gráfico 2</div>
             </section>
         </main>
     </div>
+
     <script src="js/main.js"></script>
     <script>
+        // Cargar navbar y sidebar
         fetch('navbar.html').then(res => res.text()).then(data => document.getElementById('navbar-container').innerHTML = data);
         fetch('sidebar.html').then(res => res.text()).then(data => document.getElementById('sidebar-container').innerHTML = data);
+
+        // Cargar datos del backend
+        async function cargarDatosDashboard() {
+            try {
+                // Ejemplo de endpoints (debes adaptarlos según tu API)
+                const validadoresResponse = await fetch('http://127.0.0.1:8000/validadores/count/');
+                const simsResponse = await fetch('http://127.0.0.1:8000/sims/count/');
+                const movimientosResponse = await fetch('http://127.0.0.1:8000/movimientos/count/');
+                const alertasResponse = await fetch('http://127.0.0.1:8000/alertas/count/');
+
+                // Verificar respuestas y extraer datos
+                if (validadoresResponse.ok) {
+                    const validadoresData = await validadoresResponse.json();
+                    document.getElementById('validadores-count').textContent = validadoresData.count || 0;
+                }
+                if (simsResponse.ok) {
+                    const simsData = await simsResponse.json();
+                    document.getElementById('sims-count').textContent = simsData.count || 0;
+                }
+                if (movimientosResponse.ok) {
+                    const movimientosData = await movimientosResponse.json();
+                    document.getElementById('movimientos-count').textContent = movimientosData.count || 0;
+                }
+                if (alertasResponse.ok) {
+                    const alertasData = await alertasResponse.json();
+                    document.getElementById('alertas-count').textContent = alertasData.count || 0;
+                }
+            } catch (error) {
+                console.error("Error al cargar los datos del dashboard:", error);
+            }
+        }
+
+        // Cargar datos al cargar la página
+        document.addEventListener("DOMContentLoaded", cargarDatosDashboard);
     </script>
 </body>
 </html>

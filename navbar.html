@@ -4,7 +4,14 @@
         <h2>SV Dashboard</h2>
     </div>
     <div class="navbar-user">
-        <span>Rafael Oteiza</span>
-        <img src="img/user-icon.png" alt="Usuario" class="user-icon">
+        <div class="user-info">
+            <img src="img/user-icon.png" alt="Usuario" class="user-icon">
+            <!-- Este elemento mostrará el nombre o correo del usuario -->
+            <span id="user-name" class="user-email"></span>
+        </div>
+        <a href="index.html" id="logout-link" class="logout-link">
+            <i class="material-icons">exit_to_app</i>
+        </a>
     </div>
 </header>
+<script defer src="js/main.js"></script>
