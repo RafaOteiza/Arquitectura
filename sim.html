@@ -87,7 +87,44 @@
         .extract-report-btn:hover {
             background-color: #45a049; /* Color más oscuro al pasar el mouse */
         }
-        
+        .controls-section input[type="text"],
+        .controls-section input[type="date"],
+        .controls-section select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+
+        /* Estilo para notificaciones */
+        #notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .notification {
+            padding: 15px;
+            border-radius: 5px;
+            color: #fff;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: translateY(-20px);
+        }
+
+        .notification.success {
+            background-color: #28a745;
+        }
+
+        .notification.error {
+            background-color: #dc3545;
+        }
     </style>
 </head>
 <body>
@@ -137,36 +174,36 @@
                 </div>
 
                 <!-- Sección de controles -->
-                <div class="controls-section">
+                    <div class="controls-section">
                     <!-- Agregar Nueva SIM -->
                     <div class="control-box">
                         <h3>Agregar Nueva SIM</h3>
                         <label for="new-iccid">ICCID:</label>
-                        <input type="text" id="new-iccid">
+                        <input type="text" id="new-iccid" placeholder="Ingresa el ICCID">
                         <label for="entry-date">Fecha Ingreso:</label>
-                        <input type="date" id="entry-date">
+                        <input type="date" id="entry-date" placeholder="YYYY-MM-DD">
                         <button class="add-sim-btn">Agregar SIM</button>
                     </div>
-
                     <!-- Asociar/Disociar MSISDN -->
                     <div class="control-box">
                         <h3>Asociar/Disociar MSISDN</h3>
                         <label for="sim-iccid">ICCID de la SIM:</label>
-                        <input type="text" id="sim-iccid">
+                        <input type="text" id="sim-iccid" placeholder="Ingrese el ICCID">
                         <label for="msisdn">MSISDN:</label>
-                        <input type="text" id="msisdn">
+                        <input type="text" id="msisdn" placeholder="Ingrese el MSISDN">
                         <div class="footer-buttons">
                             <button class="associate-btn">Asociar</button>
                             <button class="disassociate-btn">Disociar</button>
                         </div>
                     </div>
+
                 </div>
             </div>
         </main>
     </div>
 
-   <!-- Contenedor para notificaciones -->
-   <div id="notification-container"></div>
+    <!-- Contenedor para notificaciones -->
+    <div id="notification-container"></div>
 
    <!-- Librería SheetJS para manejar Excel -->
    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>

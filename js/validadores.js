@@ -5,14 +5,26 @@ const API_VALIDADORES_URL = "http://127.0.0.1:8002/validadores/";
 // ======================== FUNCIONES PARA VALIDADORES ========================
 
 // Función para cargar validadores
-function loadValidadores() {
+let currentPage = 1; // Página actual
+const rowsPerPage = 14; // Cantidad de filas por página
+
+function loadValidadores(page = 1) {
     fetch(`${API_VALIDADORES_URL}validadores/`)
         .then(response => response.json())
         .then(data => {
             const tableBody = document.querySelector(".table-section table tbody");
             tableBody.innerHTML = ""; // Limpiar la tabla
 
-            data.forEach(validador => {
+            // Ordenar los validadores por fecha (descendente)
+            data.sort((a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion));
+
+            // Calcular el rango de datos a mostrar
+            const startIndex = (page - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            const paginatedData = data.slice(startIndex, endIndex);
+
+            // Crear las filas para la tabla
+            paginatedData.forEach(validador => {
                 const estado = validador.estado_validador_nombre || "No asignado";
                 const ubicacion = validador.ubicacion_nombre || "No asignada";
 
@@ -25,8 +37,46 @@ function loadValidadores() {
                 `;
                 tableBody.appendChild(row);
             });
+
+            // Actualizar botones de paginación
+            updatePaginationControls(page, data.length);
         })
         .catch(error => console.error("Error al cargar validadores:", error));
+}
+
+function updatePaginationControls(currentPage, totalRows) {
+    const paginationControls = document.querySelector(".pagination-controls");
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    paginationControls.innerHTML = ""; // Limpiar los controles previos
+
+    // Botón de página anterior
+    const prevButton = document.createElement("button");
+    prevButton.textContent = "Anterior";
+    prevButton.disabled = currentPage === 1;
+    prevButton.addEventListener("click", () => {
+        if (currentPage > 1) {
+            currentPage--;
+            loadValidadores(currentPage);
+        }
+    });
+    paginationControls.appendChild(prevButton);
+
+    // Botón de página siguiente
+    const nextButton = document.createElement("button");
+    nextButton.textContent = "Siguiente";
+    nextButton.disabled = currentPage === totalPages;
+    nextButton.addEventListener("click", () => {
+        if (currentPage < totalPages) {
+            currentPage++;
+            loadValidadores(currentPage);
+        }
+    });
+    paginationControls.appendChild(nextButton);
+
+    // Mostrar información de página
+    const pageInfo = document.createElement("span");
+    pageInfo.textContent = `Página ${currentPage} de ${totalPages}`;
+    paginationControls.appendChild(pageInfo);
 }
 
 
@@ -127,24 +177,51 @@ function extractReportExcel() {
     fetch(`${API_VALIDADORES_URL}validadores/`)
         .then(response => response.json())
         .then(data => {
-            // Transformar datos para Excel
+            // Transformar datos para Excel con todos los campos disponibles
             const rows = data.map(validador => ({
+                ID: validador.id,
+                Serie: validador.serie_val, // No convertir explícitamente a número aquí
                 AMID: validador.amid_val,
+                Modelo: validador.modelo,
                 "Fecha Último Movimiento": validador.fecha_creacion,
-                Estado: validador.id_estado_validador?.nombre_estado || "N/A",
-                Ubicación: validador.id_ubicacion?.nombre_ubicacion || "N/A"
+                Estado: validador.estado_validador_nombre || "N/A",
+                Ubicación: validador.ubicacion_nombre || "N/A",
+                "Usuario ID": validador.id_usuario,
+                "Usuario Nombre": validador.usuario_nombre || "N/A",
+                "Usuario Apellido": validador.usuario_apellido || "N/A",
+                "Usuario Correo": validador.usuario_correo || "N/A"
             }));
 
             // Crear hoja de Excel
             const worksheet = XLSX.utils.json_to_sheet(rows);
+
+            // Ajustar el formato de la columna Serie como numérico
+            const range = XLSX.utils.decode_range(worksheet['!ref']);
+            for (let rowNum = range.s.r + 1; rowNum <= range.e.r; rowNum++) {
+                const cellAddress = XLSX.utils.encode_cell({ r: rowNum, c: 1 }); // Columna Serie es índice 1
+                const cell = worksheet[cellAddress];
+                if (cell && !isNaN(cell.v)) {
+                    cell.z = '0'; // Configurar formato como número simple
+                    cell.t = 'n'; // Establecer tipo de celda como numérico
+                }
+            }
+
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Validadores");
 
-            // Exportar como archivo Excel
-            XLSX.writeFile(workbook, "validadores_reporte.xlsx");
+            // Obtener la fecha actual en formato YYYY-MM-DD
+            const today = new Date().toISOString().split("T")[0];
+
+            // Exportar como archivo Excel con el nombre incluyendo la fecha
+            XLSX.writeFile(workbook, `reporte_validadores_${today}.xlsx`);
         })
-        .catch(error => console.error("Error al generar reporte Excel:", error));
+        .catch(error => {
+            console.error("Error al generar reporte Excel:", error);
+            showNotification("Error al generar el reporte.", "error");
+        });
 }
+
+
 
 // Función para manejar la Carga Masiva desde un archivo Excel
 function handleExcelUpload(event) {
@@ -165,37 +242,54 @@ function handleExcelUpload(event) {
         const validadores = XLSX.utils.sheet_to_json(worksheet);
 
         // Validar encabezados requeridos
-        const requiredHeaders = ["serie", "amid", "modelo", "fecha_ingreso", "observacion"];
+        const requiredHeaders = ["serie_val", "amid_val", "modelo"];
         const headers = Object.keys(validadores[0]);
         if (!requiredHeaders.every(header => headers.includes(header))) {
-            showToast("El archivo Excel debe contener los encabezados: serie, amid, modelo, fecha_ingreso, observacion.", "error");
+            showNotification("El archivo Excel debe contener los encabezados: serie_val, amid_val, modelo.", "error");
             return;
         }
 
-        // Preparar los datos para enviarlos al backend
-        const processedValidadores = validadores.map(row => ({
-            serie_val: row.serie,
-            amid_val: row.amid,
-            modelo: row.modelo,
-            fecha_creacion: row.fecha_ingreso,
-            observacion: row.observacion,
-            id_ubicacion: 1, // Ubicación por defecto
-            id_estado_validador: 1, // Estado por defecto
-            id_usuario: 1 // Usuario por defecto
-        }));
+        const errores = [];
+        let procesados = 0;
 
-        // Enviar datos al backend
-        fetch(`${API_VALIDADORES_URL}validadores/bulk_create/`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(processedValidadores)
-        })
-            .then(response => response.json())
-            .then(() => {
-                showToast("Carga masiva realizada con éxito.");
-                loadValidadores(); // Refrescar tabla
+        validadores.forEach((row, index) => {
+            const validadorData = {
+                serie_val: row.serie_val,
+                amid_val: row.amid_val,
+                modelo: row.modelo,
+                fecha_creacion: new Date().toISOString().split("T")[0], // Fecha actual
+                id_ubicacion: 6, // LAB-DEV
+                id_estado_validador: 2, // DISPONIBLE
+                id_usuario: 5 // Ajusta esto según el usuario logueado
+            };
+
+            // Reutilizamos la lógica de `addValidador`
+            fetch(`${API_VALIDADORES_URL}validadores/`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(validadorData)
             })
-            .catch(error => console.error("Error en la carga masiva desde Excel:", error));
+                .then(response => {
+                    if (!response.ok) {
+                        errores.push(`Fila ${index + 2}: Error al cargar el validador ${row.serie_val}`);
+                    }
+                })
+                .catch(() => {
+                    errores.push(`Fila ${index + 2}: Error de red al cargar el validador ${row.serie_val}`);
+                })
+                .finally(() => {
+                    procesados++;
+                    if (procesados === validadores.length) {
+                        // Mostrar resultados al completar todas las solicitudes
+                        if (errores.length) {
+                            showNotification(`Errores durante la carga:\n${errores.join("\n")}`, "error");
+                        } else {
+                            showNotification("Carga masiva realizada con éxito.", "success");
+                            loadValidadores(); // Refrescar tabla
+                        }
+                    }
+                });
+        });
     };
 
     reader.readAsArrayBuffer(file);

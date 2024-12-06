@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultar ICCID por Validador</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/views.css">
+    <style>
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .controls-section {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+        }
+
+        .controls-section h3 {
+            margin-bottom: 15px;
+        }
+
+        .controls-section form {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .controls-section label {
+            margin-right: 10px;
+        }
+
+        .controls-section input {
+            flex: 1;
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+        }
+
+        .controls-section button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .table-section {
+            margin-top: 20px;
+        }
+
+        .table-section table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+        }
+
+        .table-section th,
+        .table-section td {
+            padding: 12px 15px;
+            border: 1px solid #dee2e6;
+            text-align: center;
+        }
+
+        .table-section th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .table-section td {
+            background-color: #f8f9fa;
+        }
+
+        .notification-container {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+        }
+
+        .notification {
+            padding: 15px;
+            margin-bottom: 10px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div id="navbar-container"></div>
+    <div class="dashboard-container d-flex">
+        <div id="sidebar-container"></div>
+        <main class="dashboard-main flex-fill">
+            <h1 class="dashboard-header">Consultar ICCID por Validador</h1>
+            <div class="controls-section">
+                <h3>Buscar ICCID Asociados</h3>
+                <form onsubmit="event.preventDefault(); buscarICCIDPorAMID(document.getElementById('amid').value);">
+                    <label for="amid">AMID:</label>
+                    <input type="text" id="amid" placeholder="Ingresa el AMID" required>
+                    <button type="submit">Buscar</button>
+                </form>
+            </div>
+            <div class="table-section">
+                <h3>Resultados</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ICCID</th>
+                            <th>Inicio Relación</th>
+                            <th>Nombre Usuario</th>
+                            <th>MSISDN</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-iccid">
+                        <tr>
+                            <td colspan="8" style="text-align: center;">No se han realizado búsquedas.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Contenedor para notificaciones -->
+    <div id="notification-container"></div>
+
+    <script src="js/buscar_iccid.js"></script>
+    <script>
+        fetch('navbar.html')
+            .then(response => response.text())
+            .then(data => document.getElementById('navbar-container').innerHTML = data)
+            .catch(error => console.error('Error al cargar navbar:', error));
+
+        fetch('sidebar.html')
+            .then(response => response.text())
+            .then(data => document.getElementById('sidebar-container').innerHTML = data)
+            .catch(error => console.error('Error al cargar sidebar:', error));
+    </script>
+</body>
+</html>

@@ -7,14 +7,13 @@
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/views.css">
     <style>
-        /* Estilos para el botón y la lista desplegable */
         .extract-report-container {
             display: inline-flex;
             align-items: center;
         }
 
         .extract-report-btn {
-            background-color: #4CAF50; /* Cambia el color según tus estilos */
+            background-color: #4CAF50;
             color: white;
             border: none;
             padding: 10px 20px;
@@ -30,6 +29,33 @@
             border-radius: 4px;
             cursor: pointer;
         }
+
+        .filters {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .filters label {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .filters select,
+        .filters input[type="date"] {
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .table-container {
+            margin-top: 20px;
+        }
+
+        .data-table th, .data-table td {
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -39,66 +65,37 @@
         <main class="dashboard-main flex-fill">
             <h1 class="dashboard-header">Movimientos</h1>
 
+            <!-- Filtros -->
             <section class="filters">
                 <label for="date">Fecha:</label>
-                <input type="date" id="date" placeholder="dd/mm/yyyy">
-                
+                <input type="date" id="date">
+
                 <label for="movement-type">Tipo de movimiento:</label>
                 <select id="movement-type">
                     <option value="all">Todos</option>
-                    <option value="en-reparacion">En reparación</option>
-                    <option value="en-ruta">En ruta</option>
-                    <option value="en-funcionamiento">En funcionamiento</option>
-                    <option value="reparado">Reparado</option>
+                    <option value="Entrada">Entrada</option>
+                    <option value="Salida">Salida</option>
                 </select>
             </section>
 
+            <!-- Tabla de Movimientos -->
             <section class="table-container">
                 <table class="data-table" id="movements-table">
                     <thead>
                         <tr>
                             <th>Dispositivo</th>
-                            <th>Cantidad</th>
+                            <th>ID Movimiento</th>
                             <th>Tipo de Movimiento</th>
-                            <th>Estado</th>
+                            <th>Observación</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Datos de ejemplo -->
-                        <tr>
-                            <td>Validador #034452</td>
-                            <td>40</td>
-                            <td>En reparación</td>
-                            <td><input type="checkbox" checked disabled></td>
-                        </tr>
-                        <tr>
-                            <td>Validador #034452</td>
-                            <td>38</td>
-                            <td>En ruta</td>
-                            <td><input type="checkbox" checked disabled></td>
-                        </tr>
-                        <tr>
-                            <td>Validador #032332</td>
-                            <td>41</td>
-                            <td>En funcionamiento</td>
-                            <td><input type="checkbox" checked disabled></td>
-                        </tr>
-                        <tr>
-                            <td>Validador #032222</td>
-                            <td>22</td>
-                            <td>Reparado</td>
-                            <td><input type="checkbox" disabled></td>
-                        </tr>
+                        <!-- Filas generadas dinámicamente -->
                     </tbody>
                 </table>
             </section>
 
-            <div class="toggle-container">
-                <label for="data-toggle">Ocultar datos:</label>
-                <input type="checkbox" id="data-toggle">
-            </div>
-
-            <!-- Botón y lista desplegable para seleccionar el formato -->
+            <!-- Botón y selector de formato para exportar -->
             <div class="actions">
                 <div class="extract-report-container">
                     <button class="extract-report-btn" id="extract-report-btn">Extraer Reporte</button>
@@ -112,95 +109,15 @@
         </main>
     </div>
 
-    <!-- Agregar scripts de librerías externas -->
+    <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/movimientos.js"></script>
     <script>
-        // Cargar contenido del navbar y sidebar
         fetch('navbar.html').then(res => res.text()).then(data => document.getElementById('navbar-container').innerHTML = data);
         fetch('sidebar.html').then(res => res.text()).then(data => document.getElementById('sidebar-container').innerHTML = data);
-
-        // Evento para exportar en el formato seleccionado
-        document.getElementById("extract-report-btn").addEventListener("click", function () {
-            const format = document.getElementById("report-format").value;
-
-            if (format === "csv") {
-                exportToCSV();
-            } else if (format === "excel") {
-                exportToExcel();
-            } else if (format === "pdf") {
-                exportToPDF();
-            }
-        });
-
-        // Exportar a CSV
-        function exportToCSV() {
-            const table = document.getElementById("movements-table");
-            let csvContent = "";
-            
-            for (let row of table.rows) {
-                let rowData = [];
-                for (let cell of row.cells) {
-                    if (cell.children.length && cell.children[0].type === "checkbox") {
-                        rowData.push(cell.children[0].checked ? "Sí" : "No");
-                    } else {
-                        rowData.push(cell.innerText);
-                    }
-                }
-                csvContent += rowData.join(",") + "\n";
-            }
-
-            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = "reporte_movimientos.csv";
-            link.style.display = "none";
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        // Exportar a Excel
-        function exportToExcel() {
-            const table = document.getElementById("movements-table");
-            const worksheet = XLSX.utils.table_to_sheet(table);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Movimientos");
-
-            XLSX.writeFile(workbook, "reporte_movimientos.xlsx");
-        }
-
-        // Exportar a PDF
-        function exportToPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-
-            const table = document.getElementById("movements-table");
-            let data = [];
-
-            for (let row of table.rows) {
-                let rowData = [];
-                for (let cell of row.cells) {
-                    if (cell.children.length && cell.children[0].type === "checkbox") {
-                        rowData.push(cell.children[0].checked ? "Sí" : "No");
-                    } else {
-                        rowData.push(cell.innerText);
-                    }
-                }
-                data.push(rowData);
-            }
-
-            doc.text("Reporte de Movimientos", 10, 10);
-            doc.autoTable({
-                head: [["Dispositivo", "Cantidad", "Tipo de Movimiento", "Estado"]],
-                body: data,
-                startY: 20
-            });
-
-            doc.save("reporte_movimientos.pdf");
-        }
     </script>
 </body>
 </html>
