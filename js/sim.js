@@ -37,62 +37,93 @@ function searchSIMs() {
 }
 
 // Función para cargar todas las SIMs al inicio
-function loadAllSIMs() {
-    fetch(`${API_SIMS_URL}sim-msisdn/`)
-        .then(response => response.json())
-        .then(data => updateSIMTable(data))
-        .catch(error => {
-            console.error("Error al cargar las SIMs:", error);
-            showNotification("Error al cargar las SIMs.", "error");
-        });
-}
+// Variables globales
+let simsData = [];
+let currentPage = 1;
+const rowsPerPage = 9;
 
-function loadSIMStates() {
-    return fetch(`${API_SIMS_URL}estado-sim/`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Error en la respuesta: ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            simStates = data; // Guardar los estados de SIM en la variable global
-            console.log("Estados de SIM cargados:", simStates);
-        })
-        .catch(error => {
-            console.error("Error al cargar los estados de SIM:", error);
-            showNotification("Error al cargar los estados de SIM.", "error");
-        });
-}
+// Cargar SIMs al inicio
+async function loadAllSIMs() {
+    try {
+        const [simsResponse, estadosResponse] = await Promise.all([
+            fetch('http://127.0.0.1:8001/sims/sim-msisdn/'),
+            fetch('http://127.0.0.1:8001/sims/estado-sim/')
+        ]);
 
-// Función para actualizar la tabla de SIMs
-function updateSIMTable(data) {
-    const tableBody = document.querySelector(".data-table tbody");
-    tableBody.innerHTML = "";
+        simsData = await simsResponse.json();
+        simStates = await estadosResponse.json();
 
-    if (data.length === 0) {
-        const row = document.createElement("tr");
-        row.innerHTML = `<td colspan="6">No se encontraron resultados</td>`;
-        tableBody.appendChild(row);
-        return;
+        // Ordenar los datos por fecha de forma descendente
+        simsData.sort((a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion));
+
+        renderTable(); // Renderizar la tabla inicial
+        renderPagination(); // Renderizar controles de paginación
+    } catch (error) {
+        console.error("Error al cargar los datos de SIM:", error);
+        showNotification("Error al cargar los datos de SIM.", "error");
     }
+}
 
-    data.forEach(sim => {
-        // Buscar el estado correspondiente al id_estado
-        const estado = simStates.find(state => state.id === sim.id_estado) || { nombre_estado: "N/A" };
+// Renderizar tabla
+function renderTable() {
+    const tableBody = document.querySelector('.data-table tbody');
+    tableBody.innerHTML = '';
 
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td>${sim.iccid}</td>
-            <td>${sim.id_msisdn?.msisdn || "Sin Asignar"}</td>
-            <td>${sim.fecha_creacion}</td>
-            <td>${sim.id_msisdn?.nodo_concert_ip || "N/A"}</td>
-            <td>${sim.id_msisdn?.nodo_condor_ip || "N/A"}</td>
-            <td>${estado.nombre_estado}</td>
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    const visibleData = simsData.slice(startIndex, endIndex);
+
+    visibleData.forEach(sim => {
+        const estado = sim.id_estado_nombre || 'Desconocido';
+        const row = `
+            <tr>
+                <td>${sim.iccid}</td>
+                <td>${sim.id_msisdn?.msisdn || 'Sin Asignar'}</td>
+                <td>${sim.fecha_creacion}</td>
+                <td>${sim.id_msisdn?.nodo_concert_ip || 'N/A'}</td>
+                <td>${sim.id_msisdn?.nodo_condor_ip || 'N/A'}</td>
+                <td>${estado}</td>
+            </tr>
         `;
-        tableBody.appendChild(row);
+        tableBody.insertAdjacentHTML('beforeend', row);
     });
 }
+
+// Renderizar paginación
+function renderPagination() {
+    const paginationContainer = document.querySelector('.pagination-controls');
+    paginationContainer.innerHTML = '';
+
+    const totalPages = Math.ceil(simsData.length / rowsPerPage);
+
+    const prevButton = document.createElement('button');
+    prevButton.textContent = 'Anterior';
+    prevButton.disabled = currentPage === 1;
+    prevButton.addEventListener('click', () => {
+        currentPage--;
+        renderTable();
+        renderPagination();
+    });
+    paginationContainer.appendChild(prevButton);
+
+    const pageIndicator = document.createElement('span');
+    pageIndicator.textContent = `Página ${currentPage} de ${totalPages}`;
+    paginationContainer.appendChild(pageIndicator);
+
+    const nextButton = document.createElement('button');
+    nextButton.textContent = 'Siguiente';
+    nextButton.disabled = currentPage === totalPages;
+    nextButton.addEventListener('click', () => {
+        currentPage++;
+        renderTable();
+        renderPagination();
+    });
+    paginationContainer.appendChild(nextButton);
+}
+
+// Cargar datos al cargar la página
+document.addEventListener('DOMContentLoaded', loadAllSIMs);
+
 
 
 
@@ -295,6 +326,78 @@ function disassociateMSISDN() {
         });
 }
 
+// Adaptación para la carga masiva
+// Función para manejar la carga masiva de SIMs
+function handleExcelUploadSIM(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
+
+        // Leer la primera hoja del archivo Excel
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+
+        // Convertir la hoja a JSON
+        const sims = XLSX.utils.sheet_to_json(worksheet);
+
+        // Validar encabezados requeridos
+        const requiredHeaders = ["iccid", "fecha_creacion", "id_estado", "id_usuario"];
+        const headers = Object.keys(sims[0]);
+        if (!requiredHeaders.every(header => headers.includes(header))) {
+            showNotification("El archivo Excel debe contener los encabezados: iccid, fecha_creacion, id_estado, id_usuario.", "error");
+            return;
+        }
+
+        const errores = [];
+        let procesados = 0;
+
+        sims.forEach((row, index) => {
+            const simData = {
+                iccid: row.iccid.toString(), // Convertir a string si es necesario
+                inicio_relacion: row.fecha_creacion,
+                fecha_creacion: row.fecha_creacion,
+                id_estado: row.id_estado,
+                id_usuario: row.id_usuario
+            };
+
+            fetch(`${API_SIMS_URL}sim-msisdn/`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(simData)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        errores.push(`Fila ${index + 2}: Error al cargar la SIM ${row.iccid}`);
+                    }
+                })
+                .catch(() => {
+                    errores.push(`Fila ${index + 2}: Error de red al cargar la SIM ${row.iccid}`);
+                })
+                .finally(() => {
+                    procesados++;
+                    if (procesados === sims.length) {
+                        // Mostrar resultados al completar todas las solicitudes
+                        if (errores.length) {
+                            showNotification(`Errores durante la carga:\n${errores.join("\n")}`, "error");
+                        } else {
+                            showNotification("Carga masiva realizada con éxito.", "success");
+                            loadAllSIMs(); // Refrescar tabla
+                        }
+                    }
+                });
+        });
+    };
+
+    reader.readAsArrayBuffer(file);
+}
+
+// Asociar el evento al input de carga masiva
+document.getElementById("upload-excel-sim").addEventListener("change", handleExcelUploadSIM);
 
 
 // ============================ EVENTOS DEL DOM ============================
