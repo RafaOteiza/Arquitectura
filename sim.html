@@ -63,30 +63,7 @@
             background-color: #3a5bb5;
         }
 
-        /* Contenedor del botón "Extraer Reporte" */
-        .extract-report-container {
-            display: flex; /* Para centrar */
-            justify-content: center; /* Centra el botón horizontalmente */
-            margin-top: 20px; /* Espaciado superior con la tabla */
-        }
 
-        /* Estilo del botón "Extraer Reporte" */
-        .extract-report-btn {
-            background-color: #4CAF50; /* Color verde */
-            color: white; /* Texto en blanco */
-            border: none; /* Sin bordes */
-            padding: 10px 20px; /* Tamaño del botón */
-            cursor: pointer; /* Cambiar el puntero al pasar el mouse */
-            font-size: 16px; /* Tamaño del texto */
-            border-radius: 4px; /* Bordes redondeados */
-            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2); /* Sombra para resaltar */
-            transition: background-color 0.3s ease; /* Suaviza el cambio de color */
-        }
-
-        /* Efecto hover */
-        .extract-report-btn:hover {
-            background-color: #45a049; /* Color más oscuro al pasar el mouse */
-        }
         .controls-section input[type="text"],
         .controls-section input[type="date"],
         .controls-section select {
@@ -125,6 +102,42 @@
         .notification.error {
             background-color: #dc3545;
         }
+
+/* Botones en el pie */
+.footer-buttons button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2); /* Sombra */
+    margin: 5px;
+    display: inline-block;
+    width: 200px; /* Ajusta el ancho de los botones */
+}
+
+/* Botón de "Extraer Reporte" */
+.footer-buttons .extract-button {
+    background-color: #007bff; /* Azul */
+    color: #fff;
+}
+
+.footer-buttons .extract-button:hover {
+    background-color: #0056b3; /* Azul más oscuro */
+}
+
+/* Botón de "Carga Masiva" */
+.footer-buttons .upload-button {
+    background-color: #28a745; /* Verde */
+    color: #fff;
+}
+
+.footer-buttons .upload-button:hover {
+    background-color: #218838; /* Verde más oscuro */
+}
+
+
     </style>
 </head>
 <body>
@@ -167,10 +180,12 @@
                             <!-- Las filas se llenarán dinámicamente desde main.js -->
                         </tbody>
                     </table>
-                    <div id="pagination-container" class="pagination"></div>
-                    <div class="extract-report-container">
-                        <button class="extract-report-btn">Extraer Reporte</button>
+                    <div class="pagination-controls"></div>    
+                    <div class="footer-buttons">
+                        <button class="extract-button">Extraer Reporte</button>
+                        <button class="upload-button">Carga Masiva</button>
                     </div>
+        
                 </div>
 
                 <!-- Sección de controles -->

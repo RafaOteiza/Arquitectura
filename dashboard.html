@@ -6,12 +6,15 @@
     <title>Dashboard</title>
     <link rel="stylesheet" href="css/styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="js/main.js" defer></script>
+
     <style>
         /* Estilos de métricas */
         .dashboard-metrics {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
+            gap: -20px;
             margin-top: 20px;
         }
 
@@ -29,12 +32,17 @@
             overflow: hidden;
         }
 
+        .dashboard-card:hover {
+            transform: scale(1.05); /* Añade un efecto de hover */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
         .dashboard-card h3 {
-        font-size: 40px;
-        margin: 0;
-        font-weight: bold;
-        color: #ffffff; /* Color por defecto */
-    }
+            font-size: 40px;
+            margin: 0;
+            font-weight: bold;
+            color: #ffffff; /* Color por defecto */
+        }
 
         .dashboard-card span {
             font-size: 16px;
@@ -78,10 +86,10 @@
             height: 300px;
         }
         .icono-metrica {
-        font-size: 30px;
-        color: #ffffff;
-        margin-bottom: 10px;
-    }
+            font-size: 30px;
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -114,7 +122,6 @@
                 </div>
             </section>
             
-
             <!-- Gráficos -->
             <section class="dashboard-charts">
                 <div class="chart-container">
@@ -170,29 +177,54 @@
                 const validadoresResponse = await fetch('http://127.0.0.1:8002/validadores/validadores/');
                 const estadosValidadorResponse = await fetch('http://127.0.0.1:8002/validadores/estados-validador/');
                 const simsResponse = await fetch('http://127.0.0.1:8001/sims/sim-msisdn/');
+                const estadosSimResponse = await fetch('http://127.0.0.1:8001/sims/estado-sim/');
 
                 const validadoresData = await validadoresResponse.json();
                 const estadosValidadorData = await estadosValidadorResponse.json();
                 const simsData = await simsResponse.json();
+                const estadosSimData = await estadosSimResponse.json();
 
-                // Estados de Validadores
-                const validadoresPorEstado = estadosValidadorData.map(estado => ({
-                    estado: estado.nombre_estado,
-                    count: validadoresData.filter(val => val.id_estado_validador === estado.id).length
-                }));
+                // Combina los estados en una sola lista normalizando nombres
+                const estadosUnificados = new Set([
+                    ...estadosValidadorData.map(e => e.nombre_estado.toLowerCase()),
+                    ...estadosSimData.map(e => e.nombre_estado.toLowerCase())
+                ]);
+
+                const dataUnificada = Array.from(estadosUnificados).map(estado => {
+                    const validadoresCount = validadoresData.filter(val => val.estado_validador_nombre.toLowerCase() === estado).length;
+                    const simsCount = simsData.filter(sim => {
+                        const estadoSim = estadosSimData.find(est => est.id === sim.id_estado)?.nombre_estado.toLowerCase();
+                        return estadoSim === estado;
+                    }).length;
+
+                    return {
+                        estado: estado.charAt(0).toUpperCase() + estado.slice(1), // Capitalizamos
+                        validadores: validadoresCount,
+                        sims: simsCount
+                    };
+                });
 
                 const ctxValidadores = document.getElementById('chartValidadores').getContext('2d');
                 new Chart(ctxValidadores, {
                     type: 'line',
                     data: {
-                        labels: validadoresPorEstado.map(e => e.estado),
-                        datasets: [{
-                            label: 'Validadores',
-                            data: validadoresPorEstado.map(e => e.count),
-                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            borderWidth: 1
-                        }]
+                        labels: dataUnificada.map(e => e.estado),
+                        datasets: [
+                            {
+                                label: 'Validadores',
+                                data: dataUnificada.map(e => e.validadores),
+                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'SIMs',
+                                data: dataUnificada.map(e => e.sims),
+                                backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                                borderColor: 'rgba(255, 159, 64, 1)',
+                                borderWidth: 1
+                            }
+                        ]
                     }
                 });
 
@@ -200,9 +232,9 @@
                 new Chart(ctxDisponibilidad, {
                     type: 'doughnut',
                     data: {
-                        labels: ['Disponibles', 'No disponibles'],
+                        labels: ['Total Validadores', 'Total SIMs'],
                         datasets: [{
-                            data: [80, 20],
+                            data: [validadoresData.length, simsData.length], // Total de validadores y SIMs
                             backgroundColor: ['#36a2eb', '#ff6384'],
                             hoverOffset: 4
                         }]
@@ -217,6 +249,7 @@
             cargarDatosDashboard();
             cargarGraficosDashboard();
         });
+
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>

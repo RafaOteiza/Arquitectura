@@ -1,17 +1,17 @@
 <header class="navbar-header">
     <div class="navbar-logo">
         <img src="img/icono_logo.png" alt="Logo" class="logo">
-        <h2>SV Dashboard</h2>
+        <a href="dashboard.html" style="text-decoration: none; color: inherit;">
+            <h2>SV Dashboard</h2>
+        </a>
     </div>
     <div class="navbar-user">
-        <div class="user-info">
-            <img src="img/user-icon.png" alt="Usuario" class="user-icon">
-            <!-- Este elemento mostrará el nombre o correo del usuario -->
-            <span id="user-name" class="user-email"></span>
-        </div>
+        <a href="configuracion.html">
+            <img src="img/user-icon.png" alt="Usuario" class="user-icon" id="user-icon">
+        </a>
+        <span id="user-name" class="user-email">Cargando...</span>
         <a href="index.html" id="logout-link" class="logout-link">
             <i class="material-icons">exit_to_app</i>
         </a>
     </div>
 </header>
-<script defer src="js/main.js"></script>
